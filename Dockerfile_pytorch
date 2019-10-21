@@ -68,6 +68,16 @@ RUN DEBIAN_FRONTEND=noninteractive $APT_INSTALL \
         scikit-learn \
         matplotlib \
         Cython
+# ==================================================================
+# mini-conda
+# ------------------------------------------------------------------
+
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda2-4.5.11-Linux-x86_64.sh -O ~/miniconda.sh && \
+    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh && \
+    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
+    echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    echo "conda activate base" >> ~/.bashrc
 
 # ==================================================================
 # pytorch
@@ -79,11 +89,9 @@ RUN $PIP_INSTALL \
         protobuf \
         enum34 \
         pyyaml \
-        typing \
-    	torch \
-        && \
-    $PIP_INSTALL \
-    "git+https://github.com/pytorch/vision.git"
+        typing
+
+RUN /opt/conda/bin/conda install -y pytorch=1.2.0 cuda100 -c pytorch
 
 # ==================================================================
 # config & cleanup
@@ -93,3 +101,5 @@ RUN ldconfig && \
     apt-get clean && \
     apt-get autoremove && \
     rm -rf /var/lib/apt/lists/* /tmp/* ~/*
+
+ENTRYPOINT ["python -c 'import torch; print(torch.cuda.is_available())'"]
