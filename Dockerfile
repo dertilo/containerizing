@@ -30,9 +30,9 @@ RUN pip install -U --no-cache-dir \
             sqlalchemy \
             allennlp
 
-RUN pip uninstall -y bson pymongo && pip install -y bson && pip install -y pymongo
-
 RUN python -m spacy download en_core_web_sm
+
+RUN pip uninstall -y bson pymongo && pip install bson && pip install pymongo
 
 WORKDIR /docker-share
 ENV PYTHONPATH /docker-share
